@@ -1,4 +1,3 @@
-import unittest
 import time
 import json
 import datetime
@@ -8,8 +7,8 @@ from selenium.webdriver.chrome.options import Options
 from slacker import Slacker
 from slack_bot import Slack
 
-class PythonOrgSearch(unittest.TestCase):
-    def setUp(self):
+class IpoRequest():
+    def __init__(self):
         # options = Options()
         # options.add_argument('--headless')
         self.driver = webdriver.Chrome("./chromedriver")
@@ -39,6 +38,8 @@ class PythonOrgSearch(unittest.TestCase):
         slack = Slack()
         message = "everyone's ipo applied num:" + self.applyCount
         slack.post_message_to_channel("general", message)
+
+        self.driver.close()
 
     def one_person_ipo_request(self, driver, login_info):
         driver.find_element_by_name("user_id").send_keys(login_info["uid"])
@@ -92,8 +93,6 @@ class PythonOrgSearch(unittest.TestCase):
         # when today isthe previous most recent apply date, execute application
         return applyEndDate >= d_now - datetime.timedelta(days=1)
 
-    def tearDown(self):
-        self.driver.close()
-
 if __name__ == "__main__":
-    unittest.main()
+    ipoRequest = IpoRequest()
+    ipoRequest.test_ipo_request()
