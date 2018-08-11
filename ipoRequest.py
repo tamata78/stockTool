@@ -1,9 +1,11 @@
 import time
 import json
 import datetime
+import sys
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import WebDriverException
 from slacker import Slacker
 from slack_bot import Slack
 
@@ -13,6 +15,7 @@ class IpoRequest():
         # options.add_argument('--headless')
         self.driver = webdriver.Chrome("./chromedriver")
         self.applyCount = 0
+        self.IPO_REQ_BUTTON = ".mtext a img[alt='申込']"
 
         # all member login info
         f = open("config.json", 'r')
@@ -39,7 +42,7 @@ class IpoRequest():
             message = "everyone's ipo applied num:" + self.applyCount
             slack.post_message_to_channel("general", message)
         except WebDriverException:
-            message = "occurred system error!!"1
+            message = "occurred system error!!"
             slack.post_message_to_channel("general", message)
         finally:
             driver.close()
@@ -56,42 +59,56 @@ class IpoRequest():
 
         # apply IPO
         stock_tables = driver.find_elements_by_css_selector("a[name]+table")
-        stock_len = len(stock_tables)
-        if stock_len > 0:
-            mostReceStockTbl = stock_tables[stock_len - 1]
-            stockInfo = mostReceStockTbl.find_elements_by_css_selector(".mtext")
+        if not stock_tables:
+            sys.exit()
 
-            if not self.isIpoApplyExec(stockInfo):
-                sys.exit()
+        apply_stock_tables = self.createApplyStTbls(stock_tables)
+        if not apply_stock_tables:
+            sys.exit()
 
-            IPO_REQ_BUTTON = "a[name]+table .mtext a img[alt='申込']"
-            while driver.find_element_by_css_selector(IPO_REQ_BUTTON):
-                driver.find_element_by_css_selector(IPO_REQ_BUTTON).click()
-                driver.find_element_by_name("suryo").send_keys(1000)
-                driver.find_element_by_xpath("//*[@id='strPriceRadio']").click()
-                driver.find_element_by_name("useKbn").send_keys(0)
-                driver.find_element_by_name("usePoint").send_keys("")
-                driver.find_element_by_name("tr_pass").send_keys(login_info["uspa"])
-                driver.find_element_by_name("order_kakunin").click()
+        mostReceStockTbl = apply_st_tbls[stock_len - 1]
+        stockInfo = mostReceStockTbl.find_elements_by_css_selector(".mtext")
 
-                # fixed apply
-                driver.find_element_by_name("order_btn").click()
-                driver.find_element_by_css_selector(".mtext a[href='/oeliw011?type=21']").click()
+        if not self.isIpoApplyExec(stockInfo):
+            sys.exit()
 
-                self.applyCount+=1
+        for stock_table in apply_stock_tables:
+            stock_table.find_element_by_css_selector(IPO_REQ_BUTTON).click()
+
+            # input application contents
+            driver.find_element_by_name("suryo").send_keys(1000)
+            driver.find_element_by_xpath("//*[@id='strPriceRadio']").click()
+            driver.find_element_by_name("useKbn").send_keys(0)
+            driver.find_element_by_name("usePoint").send_keys("")
+            driver.find_element_by_name("tr_pass").send_keys(login_info["uspa"])
+            driver.find_element_by_name("order_kakunin").click()
+
+            # fixed apply
+            driver.find_element_by_name("order_btn").click()
+            driver.find_element_by_css_selector(".mtext a[href='/oeliw011?type=21']").click()
+
+            self.applyCount+=1
 
         # logout
         driver.find_element_by_xpath('//*[@id="logoutM"]/a/img').click()
         driver.find_element_by_xpath('//*[@id="navi01P"]/ul/li[1]/a/img').click()
 
+    def createApplyStTbls(self, stock_tables):
+        applyStTbls = []
+        for table in stock_tables:
+            if table.find_elements_by_css_selector(self.IPO_REQ_BUTTON):
+                applyStTbls.append(table)
+
+        return applyStTbls
+
     def isIpoApplyExec(self, stockInfo):
-        strApplyEndDate = stockInfo[0].split("～")[1].split(" ")[0]
-        strApplyEndMon = strApplyEndDate.split("/")[0]
-        strApplyEndDay = strApplyEndDate.split("/")[1]
+        strApplyEndDate = stockInfo[1].text.split("～")[1].split(" ")[0]
+        applyEndMon = int(strApplyEndDate.split("/")[0])
+        applyEndDay = int(strApplyEndDate.split("/")[1])
 
         d_now = datetime.date.today()
         year_now = d_now.year
-        applyEndDate = datetime.date(year_now, strApplyEndMon, strApplyEndDay)
+        applyEndDate = datetime.date(year_now, applyEndMon, applyEndDay)
 
         # when today isthe previous most recent apply date, execute application
         return applyEndDate >= d_now - datetime.timedelta(days=1)
