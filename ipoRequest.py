@@ -27,19 +27,22 @@ class IpoRequest():
 
     def test_ipo_request(self):
         driver = self.driver
-
-        # SBI securities page
-        driver.get("https://www.sbisec.co.jp/ETGate")
-
-        for login_info in self.login_info_list:
-            self.one_person_ipo_request(driver, login_info)
-
-        # slack notice
         slack = Slack()
-        message = "everyone's ipo applied num:" + self.applyCount
-        slack.post_message_to_channel("general", message)
+        try:
+            # SBI securities page
+            driver.get("https://www.sbisec.co.jp/ETGate")
 
-        self.driver.close()
+            for login_info in self.login_info_list:
+                self.one_person_ipo_request(driver, login_info)
+
+            # slack notice
+            message = "everyone's ipo applied num:" + self.applyCount
+            slack.post_message_to_channel("general", message)
+        except WebDriverException:
+            message = "occurred system error!!"1
+            slack.post_message_to_channel("general", message)
+        finally:
+            driver.close()
 
     def one_person_ipo_request(self, driver, login_info):
         driver.find_element_by_name("user_id").send_keys(login_info["uid"])
