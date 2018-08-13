@@ -5,14 +5,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
-import unittest, time, re, sys
+import time, re, sys
 import mojimoji
 import datetime
 import json
-import pdb
 
 class MoveMoneyInnerAccount(unittest.TestCase):
-    def setUp(self):
+    def __init__(self):
         self.driver = webdriver.Chrome("./chromedriver")
         self.verificationErrors = []
 
@@ -21,7 +20,6 @@ class MoveMoneyInnerAccount(unittest.TestCase):
         if len(sys.argv) > 1:
             param_han_month = sys.argv[1]
         han_month = str(datetime.datetime.today().month + 1)
-        #han_month = str(datetime.datetime.today().month)
         self.month = mojimoji.han_to_zen(han_month if param_han_month is None else param_han_month)
 
         # all member login info
@@ -32,11 +30,13 @@ class MoveMoneyInnerAccount(unittest.TestCase):
         self.login_info = sbib["sbib_login_info"]
         self.move_money_info = sbib["move_money_info"]
 
-    def test_sbi_money_move(self):
+    def sbi_money_move(self):
         driver = self.driver
         login_info = self.login_info
         mmoney_info = self.move_money_info
         zen_month = self.month
+
+        sys.exit()
 
         # login
         driver.get("https://www.netbk.co.jp/wpl/NBGate/i010002CT")
@@ -158,5 +158,6 @@ class MoveMoneyInnerAccount(unittest.TestCase):
         self.assertEqual([], self.verificationErrors)
 
 if __name__ == "__main__":
-    unittest.main()
+    moveMoney = MoveMoneyInnerAccount()
+    moveMoney.sbi_money_move()
 
