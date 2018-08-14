@@ -5,14 +5,14 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
-import unittest, time, re, sys
+from enum import Enum
+import time, re, sys
 import mojimoji
 import datetime
 import json
-import pdb
 
-class MoveMoneyInnerAccount(unittest.TestCase):
-    def setUp(self):
+class MoveMoneyInnerAccount():
+    def __init__(self):
         self.driver = webdriver.Chrome("./chromedriver")
         self.verificationErrors = []
 
@@ -21,7 +21,6 @@ class MoveMoneyInnerAccount(unittest.TestCase):
         if len(sys.argv) > 1:
             param_han_month = sys.argv[1]
         han_month = str(datetime.datetime.today().month + 1)
-        #han_month = str(datetime.datetime.today().month)
         self.month = mojimoji.han_to_zen(han_month if param_han_month is None else param_han_month)
 
         # all member login info
@@ -32,10 +31,9 @@ class MoveMoneyInnerAccount(unittest.TestCase):
         self.login_info = sbib["sbib_login_info"]
         self.move_money_info = sbib["move_money_info"]
 
-    def test_sbi_money_move(self):
+    def sbi_money_move(self):
         driver = self.driver
         login_info = self.login_info
-        mmoney_info = self.move_money_info
         zen_month = self.month
 
         # login
@@ -45,49 +43,12 @@ class MoveMoneyInnerAccount(unittest.TestCase):
         driver.find_element_by_xpath("//*[@id='side']/form/div/div[2]/div[1]/input").click()
         driver.find_element_by_xpath("//*[@id='main']/div[5]/dl[1]/dd/dl[2]/dt/a").click()
 
-        # transfar from delegate to travel
-        driver.find_element_by_name("whdrwlAcctCode").click()
-        driver.find_element_by_xpath("(//input[@name='dpstAcctCode'])[3]").click()
-        driver.find_element_by_name("transAmt").send_keys(mmoney_info["travel"])
-        driver.find_element_by_name("ACT_doConfirm").click()
-        driver.find_element_by_name("transPW").send_keys(login_info["uspa"])
-        driver.find_element_by_name("ACT_doDecide").click()
-        driver.find_element_by_link_text(u"他の振替を行う").click()
-
-        # transfar from delegate to funding
-        driver.find_element_by_name("whdrwlAcctCode").click()
-        driver.find_element_by_xpath("(//input[@name='dpstAcctCode'])[4]").click()
-        driver.find_element_by_name("transAmt").send_keys(mmoney_info["funding"])
-        driver.find_element_by_name("ACT_doConfirm").click()
-        driver.find_element_by_name("transPW").send_keys(login_info["uspa"])
-        driver.find_element_by_name("ACT_doDecide").click()
-        driver.find_element_by_link_text(u"他の振替を行う").click()
-
-        # transfar from delegate to special expense
-        driver.find_element_by_name("whdrwlAcctCode").click()
-        driver.find_element_by_xpath("(//input[@name='dpstAcctCode'])[5]").click()
-        driver.find_element_by_name("transAmt").send_keys(mmoney_info["special_expense"])
-        driver.find_element_by_name("ACT_doConfirm").click()
-        driver.find_element_by_name("transPW").send_keys(login_info["uspa"])
-        driver.find_element_by_name("ACT_doDecide").click()
-        driver.find_element_by_link_text(u"他の振替を行う").click()
-
-        # transfar from delegate to personal
-        driver.find_element_by_name("whdrwlAcctCode").click()
-        driver.find_element_by_xpath("(//input[@name='dpstAcctCode'])[6]").click()
-        driver.find_element_by_name("transAmt").send_keys(mmoney_info["personal"])
-        driver.find_element_by_name("ACT_doConfirm").click()
-        driver.find_element_by_name("transPW").send_keys(login_info["uspa"])
-        driver.find_element_by_name("ACT_doDecide").click()
-        driver.find_element_by_link_text(u"他の振替を行う").click()
-
-        # transfar from delegate to education
-        driver.find_element_by_name("whdrwlAcctCode").click()
-        driver.find_element_by_xpath("(//input[@name='dpstAcctCode'])[7]").click()
-        driver.find_element_by_name("transAmt").send_keys(mmoney_info["education"])
-        driver.find_element_by_name("ACT_doConfirm").click()
-        driver.find_element_by_name("transPW").send_keys(login_info["uspa"])
-        driver.find_element_by_name("ACT_doDecide").click()
+        # transfar money from delegate
+        self.transfarMoney(AcctCode.TRAVEL)
+        self.transfarMoney(AcctCode.FUNDING)
+        self.transfarMoney(AcctCode.SEXPENSE)
+        self.transfarMoney(AcctCode.PERSONAL)
+        self.transfarMoney(AcctCode.EDUCATION)
 
         # access delegate detail
         driver.get("https://www.netbk.co.jp/wpl/NBGate/i020201CT/PD/01/01/001/01")
@@ -153,10 +114,36 @@ class MoveMoneyInnerAccount(unittest.TestCase):
         # each account display
         driver.find_element_by_xpath(u"(//a[contains(text(),'残高照会（口座別）')])[3]").click()
 
+    def transfarMoney(self, acctCode):
+        driver = self.driver
+        mmoney_info = self.move_money_info
+        login_info = self.login_info
+
+        driver.find_element_by_name("whdrwlAcctCode").click()
+        driver.find_element_by_xpath("(//input[@name='dpstAcctCode'])[" + acctCode.code + "]").click()
+        driver.find_element_by_name("transAmt").send_keys(mmoney_info[acctCode.money_key])
+        driver.find_element_by_name("ACT_doConfirm").click()
+        driver.find_element_by_name("transPW").send_keys(login_info["uspa"])
+        driver.find_element_by_name("ACT_doDecide").click()
+        driver.find_element_by_link_text(u"他の振替を行う").click()
+
     def tearDown(self):
         self.driver.quit()
         self.assertEqual([], self.verificationErrors)
 
+class AcctCode(Enum):
+    TRAVEL = ("3", "travel")
+    FUNDING = ("4", "funding")
+    SEXPENSE = ("5", "special_expense")
+    PERSONAL = ("6", "personal")
+    EDUCATION = ("7", "education")
+
+    def __init__(self, code, money_key):
+        self.code = code
+        self.money_key = money_key
+
 if __name__ == "__main__":
-    unittest.main()
+    moveMoney = MoveMoneyInnerAccount()
+    moveMoney.sbi_money_move()
+
 

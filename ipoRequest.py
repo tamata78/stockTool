@@ -28,7 +28,7 @@ class IpoRequest():
         login_info = json_data["sbis_login_info"]
         self.login_info_list = login_info
 
-    def test_ipo_request(self):
+    def ipo_request(self):
         driver = self.driver
         slack = Slack()
         try:
@@ -115,4 +115,4 @@ class IpoRequest():
 
 if __name__ == "__main__":
     ipoRequest = IpoRequest()
-    ipoRequest.test_ipo_request()
+    ipoRequest.ipo_request()
