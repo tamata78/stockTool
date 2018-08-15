@@ -55,61 +55,22 @@ class MoveMoneyInnerAccount():
 
         # delegate memo edit
         driver.find_element_by_link_text(u"メモ編集").click()
-        driver.find_element_by_name("memoInput").send_keys(u"" + zen_month + "月分")
-        driver.find_element_by_xpath("(//input[@name='memoInput'])[2]").clear
-        driver.find_element_by_xpath("(//input[@name='memoInput'])[2]").send_keys(u"" + zen_month + "月分")
-        driver.find_element_by_xpath("(//input[@name='memoInput'])[3]").clear
-        driver.find_element_by_xpath("(//input[@name='memoInput'])[3]").send_keys(u"" + zen_month + "月分、冠婚・ネット購入代")
-        driver.find_element_by_xpath("(//input[@name='memoInput'])[4]").clear
-        driver.find_element_by_xpath("(//input[@name='memoInput'])[4]").send_keys(u"" + zen_month + "月分、教育教材、寄付控")
-        driver.find_element_by_xpath("(//input[@name='memoInput'])[5]").clear
-        driver.find_element_by_xpath("(//input[@name='memoInput'])[5]").send_keys(u"" + zen_month + "月分")
+        self.editMemoDelegate(AcctNote.TRAVEL)
+        self.editMemoDelegate(AcctNote.FUNDING)
+        self.editMemoDelegate(AcctNote.SEXPENSE)
+        self.editMemoDelegate(AcctNote.PERSONAL)
+        self.editMemoDelegate(AcctNote.EDUCATION)
         driver.find_element_by_name("ACT_doDecideMemoEdit").click()
 
         # account details move
         driver.find_element_by_xpath("//*[@id='MC2020001_M03']/a").click()
 
         # fund memo edit
-        driver.find_element_by_name("acctBusPdCodeInput").click()
-        Select(driver.find_element_by_name("acctBusPdCodeInput")).select_by_visible_text(u"旅費")
-        driver.find_element_by_name("ACT_doShow").click()
-        driver.find_element_by_link_text(u"メモ編集").click()
-        driver.find_element_by_name("memoInput").send_keys(u"" + zen_month + "月分")
-        driver.find_element_by_name("ACT_doDecideMemoEdit").click()
-
-        # fund memo edit
-        driver.find_element_by_name("acctBusPdCodeInput").click()
-        Select(driver.find_element_by_name("acctBusPdCodeInput")).select_by_visible_text(u"積立（教、節税）")
-        driver.find_element_by_name("ACT_doShow").click()
-        driver.find_element_by_link_text(u"メモ編集").click()
-        driver.find_element_by_name("memoInput").send_keys(u"" + zen_month + "月分教育教材、寄付控")
-        driver.find_element_by_xpath("//body").click()
-        driver.find_element_by_name("ACT_doDecideMemoEdit").click()
-
-        # special expense memo edit
-        driver.find_element_by_name("acctBusPdCodeInput").click()
-        Select(driver.find_element_by_name("acctBusPdCodeInput")).select_by_visible_text(u"冠婚・大物・服")
-        driver.find_element_by_name("ACT_doShow").click()
-        driver.find_element_by_link_text(u"メモ編集").click()
-        driver.find_element_by_name("memoInput").send_keys(u"" + zen_month + "月分")
-        driver.find_element_by_xpath("//body").click()
-        driver.find_element_by_name("ACT_doDecideMemoEdit").click()
-
-        # personal memo edit
-        driver.find_element_by_name("acctBusPdCodeInput").click()
-        Select(driver.find_element_by_name("acctBusPdCodeInput")).select_by_visible_text(u"個人")
-        driver.find_element_by_name("ACT_doShow").click()
-        driver.find_element_by_link_text(u"メモ編集").click()
-        driver.find_element_by_name("memoInput").send_keys(u"" + zen_month + "月分")
-        driver.find_element_by_name("ACT_doDecideMemoEdit").click()
-
-        # education memo edit
-        driver.find_element_by_name("acctBusPdCodeInput").click()
-        Select(driver.find_element_by_name("acctBusPdCodeInput")).select_by_visible_text(u"教育費")
-        driver.find_element_by_name("ACT_doShow").click()
-        driver.find_element_by_link_text(u"メモ編集").click()
-        driver.find_element_by_name("memoInput").send_keys(u"" + zen_month + "月分")
-        driver.find_element_by_name("ACT_doDecideMemoEdit").click()
+        self.editMemo(AcctNote.TRAVEL)
+        self.editMemo(AcctNote.FUNDING)
+        self.editMemo(AcctNote.SEXPENSE)
+        self.editMemo(AcctNote.PERSONAL)
+        self.editMemo(AcctNote.EDUCATION)
 
         # each account display
         driver.find_element_by_xpath(u"(//a[contains(text(),'残高照会（口座別）')])[3]").click()
@@ -127,6 +88,23 @@ class MoveMoneyInnerAccount():
         driver.find_element_by_name("ACT_doDecide").click()
         driver.find_element_by_link_text(u"他の振替を行う").click()
 
+    def editMemoDelegate(self, acctNote):
+        driver = self.driver
+        zen_month = self.month
+
+        driver.find_element_by_xpath("(//input[@name='memoInput'])[" + acctNote.move_money_order + "]").send_keys(u"" + zen_month + "月分" + acctNote.memo)
+
+    def editMemo(self, acctNote):
+        driver = self.driver
+        zen_month = self.month
+
+        driver.find_element_by_name("acctBusPdCodeInput").click()
+        Select(driver.find_element_by_name("acctBusPdCodeInput")).select_by_visible_text(acctNote.acct)
+        driver.find_element_by_name("ACT_doShow").click()
+        driver.find_element_by_link_text(u"メモ編集").click()
+        driver.find_element_by_name("memoInput").send_keys(u"" + zen_month + "月分" + acctNote.memo)
+        driver.find_element_by_name("ACT_doDecideMemoEdit").click()
+
     def tearDown(self):
         self.driver.quit()
         self.assertEqual([], self.verificationErrors)
@@ -141,6 +119,18 @@ class AcctCode(Enum):
     def __init__(self, code, money_key):
         self.code = code
         self.money_key = money_key
+
+class AcctNote(Enum):
+    TRAVEL = ("5", u"旅費", "")
+    FUNDING = ("4", u"積立（教、節税）","、教育教材、寄付控")
+    SEXPENSE = ("3", u"冠婚・大物・服", "、冠婚・ネット購入代")
+    PERSONAL = ("2", u"個人", "")
+    EDUCATION = ("1", u"教育費", "")
+
+    def __init__(self, move_money_order, acct, memo):
+        self.move_money_order = move_money_order
+        self.acct = acct
+        self.memo = memo
 
 if __name__ == "__main__":
     moveMoney = MoveMoneyInnerAccount()
