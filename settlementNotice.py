@@ -5,26 +5,19 @@ from selenium.common.exceptions import NoAlertPresentException
 from slacker import Slacker
 from slack_bot import Slack
 from operator import itemgetter
-import unittest
 import datetime
 import json
 import pdb
 
-class UntitledTestCase(unittest.TestCase):
+class SettlementNotice():
     def setUp(self):
         self.driver = webdriver.Chrome("./chromedriver")
-        self.verificationErrors = []
-
-        # web page access setting
-        self.TIMEOUT = 10
-        self.driver.set_page_load_timeout = (self.TIMEOUT)
 
         # user
         f = open("./config.json", 'r')
         json_data = json.load(f)
         f.close()
-        user = json_data["stocks_pf"]
-        self.user = user
+        self.user = json_data["stocks_pf"]
 
     def get_stockInfoList(self):
         # portfolio HP
@@ -50,15 +43,8 @@ class UntitledTestCase(unittest.TestCase):
         # holdings stock
         return stockInfoList
 
-    def test_settlement_notice(self):
-        driver = self.driver
-        user = self.user
-
-        # holdings stock list
-        self.stockInfoList = self.get_stockInfoList()
-
-        # get finance info from kabtan
-        for stockInfo in self.stockInfoList:
+    def set_kabtan_stockInfo(self, stockInfoList):
+        for stockInfo in stockInfoList:
             stockCd = stockInfo["stockCd"]
             finance_url = "https://kabutan.jp/stock/finance?code=" + stockCd + "&mode=k"
             driver.get(finance_url)
@@ -73,8 +59,18 @@ class UntitledTestCase(unittest.TestCase):
             # set finance_url
             stockInfo["finance_url"] = finance_url
 
+    def settlement_notice(self):
+        driver = self.driver
+        user = self.user
+
+        # holdings stock list
+        stockInfoList = self.get_stockInfoList()
+
+        # set finance info from kabtan
+        self.set_kabtan_stockInfo(stockInfoList)
+
         # set display message
-        sortedStockInfoList = sorted(self.stockInfoList, key=itemgetter("profitAnnoDay"))
+        sortedStockInfoList = sorted(stockInfoList, key=itemgetter("profitAnnoDay"))
         mesList = []
         for info in sortedStockInfoList:
             if info["profitAnnoDay"] == '-':
@@ -88,9 +84,9 @@ class UntitledTestCase(unittest.TestCase):
         slack = Slack()
         slack.post_message_to_channel("general", message)
 
-    def tearDown(self):
         self.driver.quit()
 
 if __name__ == "__main__":
-    unittest.main()
+    settle = SettlementNotice()
+    settle.settlement_notice()
 
