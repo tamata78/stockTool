@@ -10,7 +10,7 @@ import json
 import pdb
 
 class SettlementNotice():
-    def setUp(self):
+    def __init__(self):
         self.driver = webdriver.Chrome("./chromedriver")
 
         # user
@@ -44,6 +44,7 @@ class SettlementNotice():
         return stockInfoList
 
     def set_kabtan_stockInfo(self, stockInfoList):
+        driver = self.driver
         for stockInfo in stockInfoList:
             stockCd = stockInfo["stockCd"]
             finance_url = "https://kabutan.jp/stock/finance?code=" + stockCd + "&mode=k"
@@ -57,7 +58,7 @@ class SettlementNotice():
                 stockInfo["profitAnnoDay"] = '-'
 
             # set finance_url
-            stockInfo["finance_url"] = finance_url
+            stockInfo["finance_url"] = "<" + finance_url + "|決算情報>"
 
     def settlement_notice(self):
         driver = self.driver
