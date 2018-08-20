@@ -6,14 +6,12 @@ from slacker import Slacker
 from slack_bot import Slack
 from seleniumUtil import SeleniumUtil
 from operator import itemgetter
-import datetime
 import json
 
 class UsaSettlementNotice():
     def __init__(self):
         self.driver = webdriver.Chrome("./chromedriver")
         self.window_handle_len = len(self.driver.window_handles)
-        TGT_ACC = 0
 
         # user
         f = open("./config.json", 'r')
