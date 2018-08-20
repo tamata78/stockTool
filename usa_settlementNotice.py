@@ -13,35 +13,40 @@ class UsaSettlementNotice():
         self.driver = webdriver.Chrome("./chromedriver")
         self.window_handle_len = len(self.driver.window_handles)
 
-        # user
+        # get main login user
         f = open("./config.json", 'r')
         config = json.load(f)
         f.close()
         self.user = config["sbis_login_info"][0]
 
     def settlement_notice(self):
-        driver = self.driver
+        try:
+            driver = self.driver
 
-        # holdings stock list
-        stockInfoList = self.get_stockInfoList()
+            # holdings stock list
+            stockInfoList = self.get_stockInfoList()
 
-        # set finance info from kabtan
-        self.set_settlementInfo(stockInfoList)
+            # set finance info from kabtan
+            self.set_settlementInfo(stockInfoList)
 
-        # set display message
-        sortedStockInfoList = sorted(stockInfoList, key=itemgetter("profitAnnoDay"))
-        mesList = []
-        for info in sortedStockInfoList:
-            mesList.append(" ".join([val for val in info.values()]))
+            # set display message
+            sortedStockInfoList = sorted(stockInfoList, key=itemgetter("profitAnnoDay"))
+            mesList = []
+            for info in sortedStockInfoList:
+                mesList.append(" ".join([val for val in info.values()]))
 
-        mesStockInfo = '\n'.join(mesList)
-        message = "portfolio settlement day\n" + mesStockInfo
+            mesStockInfo = '\n'.join(mesList)
+            message = "portfolio settlement day\n" + mesStockInfo
 
-        # slack notice
-        slack = Slack()
-        slack.post_message_to_channel("general", message)
+            # slack notice
+            slack = Slack()
+            slack.post_message_to_channel("general", message)
 
-        self.driver.quit()
+        except:
+            print 'settlement info extraction error.'
+
+        finally:
+            self.driver.quit()
 
     def get_stockInfoList(self):
         # portfolio HP
