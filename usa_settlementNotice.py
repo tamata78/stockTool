@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import NoAlertPresentException
 from slacker import Slacker
 from slack_bot import Slack
 from seleniumUtils import SeleniumUtils
 from operator import itemgetter
+from timeUtils import TimeUtils as tu
 import json
 
 class UsaSettlementNotice():
@@ -42,8 +42,9 @@ class UsaSettlementNotice():
             slack = Slack()
             slack.post_message_to_channel("general", message)
 
-        except:
-            print 'settlement info extraction error.'
+        except NoSuchElementException as e:
+            print('settlement info extraction error.')
+            print('例外args:', e.args)
 
         finally:
             self.driver.quit()
