@@ -66,14 +66,15 @@ class IpoRequest():
         if not apply_stock_tables:
             sys.exit()
 
-        mostReceStockTbl = apply_st_tbls[stock_len - 1]
+        stock_len = len(apply_stock_tables)
+        mostReceStockTbl = apply_stock_tables[stock_len - 1]
         stockInfo = mostReceStockTbl.find_elements_by_css_selector(".mtext")
 
         if not self.isIpoApplyExec(stockInfo):
             sys.exit()
 
         for stock_table in apply_stock_tables:
-            stock_table.find_element_by_css_selector(IPO_REQ_BUTTON).click()
+            stock_table.find_element_by_css_selector(self.IPO_REQ_BUTTON).click()
 
             # input application contents
             driver.find_element_by_name("suryo").send_keys(1000)
@@ -87,7 +88,7 @@ class IpoRequest():
             driver.find_element_by_name("order_btn").click()
             driver.find_element_by_css_selector(".mtext a[href='/oeliw011?type=21']").click()
 
-            self.applyCount+=1
+            self.applyCount += 1
 
         # logout
         driver.find_element_by_xpath('//*[@id="logoutM"]/a/img').click()
