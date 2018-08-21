@@ -4,7 +4,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 from slacker import Slacker
 from slack_bot import Slack
-from seleniumUtil import SeleniumUtil
+from seleniumUtils import SeleniumUtils
 from operator import itemgetter
 import json
 
@@ -62,7 +62,7 @@ class UsaSettlementNotice():
 
         # forign stock page
         driver.find_element_by_xpath('//*[@id="side"]/div[2]/div/div/div/div/ul/li[3]/a').click()
-        self.window_handle_len = SeleniumUtil.switch_other_tab(driver, window_handle_len)
+        self.window_handle_len = SeleniumUtils.switch_other_tab(driver, window_handle_len)
         driver.find_element_by_xpath('//*[@id="gNav"]/ul/li[5]/a/img').click()
         driver.find_element_by_xpath('//*[@id="mArea02"]/div[2]/ul/li[2]/a').click()
 
