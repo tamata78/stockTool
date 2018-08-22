@@ -42,7 +42,8 @@ class IpoRequest():
             message = "everyone's ipo applied num:" + self.applyCount
             slack.post_message_to_channel("general", message)
         except WebDriverException:
-            message = "occurred system error!!"
+            import traceback
+            message = "occurred system error!!\n" + traceback.print_exc()
             slack.post_message_to_channel("general", message)
         finally:
             driver.close()
