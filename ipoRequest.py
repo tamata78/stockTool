@@ -66,11 +66,16 @@ class IpoRequest():
         apply_stock_tables = self.createApplyStTbls(stock_tables)
         if not apply_stock_tables:
             sys.exit()
+# remove commentout if you fail on the way
+#            driver.find_element_by_xpath('//*[@id="logoutM"]/a/img').click()
+#            driver.find_element_by_xpath('//*[@id="navi01P"]/ul/li[1]/a/img').click()
+#            return
 
         stock_len = len(apply_stock_tables)
         mostReceStockTbl = apply_stock_tables[stock_len - 1]
         stockInfo = mostReceStockTbl.find_elements_by_css_selector(".mtext")
 
+# do commentout below two line if you fail on the way
         if not self.isIpoApplyExec(stockInfo):
             sys.exit()
 
@@ -78,7 +83,7 @@ class IpoRequest():
             stock_table.find_element_by_css_selector(self.IPO_REQ_BUTTON).click()
 
             # input application contents
-            driver.find_element_by_name("suryo").send_keys(1000)
+            driver.find_element_by_name("suryo").send_keys(1000) # request num
             driver.find_element_by_xpath("//*[@id='strPriceRadio']").click()
             driver.find_element_by_name("useKbn").send_keys(0)
             driver.find_element_by_name("usePoint").send_keys("")
