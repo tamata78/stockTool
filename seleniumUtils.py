@@ -2,7 +2,7 @@
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 
-class SeleniumUtil:
+class SeleniumUtils:
 
     @staticmethod
     def switch_other_tab(driver, window_handle_len):

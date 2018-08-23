@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import NoAlertPresentException
 from slacker import Slacker
 from slack_bot import Slack
-from seleniumUtil import SeleniumUtil
+from seleniumUtils import SeleniumUtils
 from operator import itemgetter
+from timeUtils import TimeUtils as tu
 import json
 
 class UsaSettlementNotice():
@@ -42,8 +42,9 @@ class UsaSettlementNotice():
             slack = Slack()
             slack.post_message_to_channel("general", message)
 
-        except:
-            print 'settlement info extraction error.'
+        except NoSuchElementException as e:
+            print('settlement info extraction error.')
+            print('例外args:', e.args)
 
         finally:
             self.driver.quit()
@@ -62,7 +63,7 @@ class UsaSettlementNotice():
 
         # forign stock page
         driver.find_element_by_xpath('//*[@id="side"]/div[2]/div/div/div/div/ul/li[3]/a').click()
-        self.window_handle_len = SeleniumUtil.switch_other_tab(driver, window_handle_len)
+        self.window_handle_len = SeleniumUtils.switch_other_tab(driver, window_handle_len)
         driver.find_element_by_xpath('//*[@id="gNav"]/ul/li[5]/a/img').click()
         driver.find_element_by_xpath('//*[@id="mArea02"]/div[2]/ul/li[2]/a').click()
 
@@ -83,6 +84,9 @@ class UsaSettlementNotice():
 
             stockInfo["stockCd"] = elTds[0].find_element_by_tag_name('div').text.split()[0]
             stockInfo["stockNm"] = elTds[0].find_element_by_tag_name('a').text
+            stockInfo["profitAnnoDay"] = '-'
+            morni_stock_url = "https://www.morningstar.co.jp/frstock_us/stock.html?symbol1=" + stockInfo["stockCd"]
+            stockInfo["morningstar_st_info"] = "<" + morni_stock_url + "|stock_info>"
 
             stockInfoList.append(stockInfo)
 
@@ -93,24 +97,10 @@ class UsaSettlementNotice():
         finance_url = "https://www.sbisec.co.jp/ETGate/?_ControlID=WPLETmgR001Control&_PageID=WPLETmgR001Mdtl20&_DataStoreID=DSWPLETmgR001Control&_ActionID=DefaultAID&burl=iris_economicCalendar&cat1=market&cat2=economicCalender&dir=tl1-cal%7Ctl2-schedule%7Ctl3-foreign%7Ctl4-US&file=index.html&getFlg=on"
         driver.get(finance_url)
 
+        settleInfo = driver.find_element_by_xpath('//*[@id="MAINAREA01"]/table/tbody')
         for stockInfo in stockInfoList:
-            stockCd = stockInfo["stockCd"]
-
-            # set profitAnnoDay
-            settleList = driver.find_elements_by_xpath('//*[@id="MAINAREA01"]/table/tbody/tr')
-            profitAnnoDay = ''
-            for settle in settleList:
-                settleTds = settle.find_elements_by_tag_name('td')
-                if settleTds[0].text == stockInfo["stockCd"]:
-                    profitAnnoDay = settleTds[2].text
-
-            if profitAnnoDay:
-                stockInfo["profitAnnoDay"] = profitAnnoDay
-            else:
-                stockInfo["profitAnnoDay"] = '-'
-
-            stock_url = "https://www.morningstar.co.jp/frstock_us/stock.html?symbol1=" + stockCd
-            stockInfo["stock_info"] = "<" + stock_url + "|stock_info>"
+            stockInfo["profitAnnoDay"] = settleInfo.find_element_by_xpath( \
+                    'tr/td[position()=1][text()="'+ stockCd +'"]/parent::tr/td[position()=3]').text
 
 if __name__ == "__main__":
     settle = UsaSettlementNotice()
