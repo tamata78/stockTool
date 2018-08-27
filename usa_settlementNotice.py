@@ -99,8 +99,12 @@ class UsaSettlementNotice():
 
         settleInfo = driver.find_element_by_xpath('//*[@id="MAINAREA01"]/table/tbody')
         for stockInfo in stockInfoList:
-            stockInfo["profitAnnoDay"] = settleInfo.find_element_by_xpath( \
+            stockCd = stockInfo["stockCd"]
+            try:
+                stockInfo["profitAnnoDay"] = settleInfo.find_element_by_xpath( \
                     'tr/td[position()=1][text()="'+ stockCd +'"]/parent::tr/td[position()=3]').text
+            except NoSuchElementException:
+                stockInfo["profitAnnoDay"] = "-"
 
 if __name__ == "__main__":
     settle = UsaSettlementNotice()
