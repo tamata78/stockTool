@@ -39,7 +39,7 @@ class IpoRequest():
                 self.one_person_ipo_request(driver, login_info)
 
             # slack notice
-            message = "everyone's ipo applied num:" + self.applyCount
+            message = "everyone's ipo applied num:" + str(self.applyCount)
             slack.post_message_to_channel("general", message)
         except WebDriverException:
             import traceback
