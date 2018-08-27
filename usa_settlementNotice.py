@@ -32,11 +32,20 @@ class UsaSettlementNotice():
             # set display message
             sortedStockInfoList = sorted(stockInfoList, key=itemgetter("profitAnnoDay"))
             mesList = []
+            mesLinkParam = []
+            stockCount = 1
             for info in sortedStockInfoList:
                 mesList.append(" ".join([val for val in info.values()]))
+                if stockCount <= 5:
+                    mesLinkParam.append("&symbol" + str(stockCount) + "=" + info["stockCd"])
+                    stockCount += 1
 
             mesStockInfo = '\n'.join(mesList)
-            message = "portfolio settlement day\n" + mesStockInfo
+            mesCompareChartLink = '<https://www.morningstar.co.jp/frstock_us/compare.html?term=1Y' \
+                    + ''.join(mesLinkParam) + '|compare chart>'
+
+            message = "=== portfolio settlement day ===\n" + mesStockInfo + "\n"\
+                    + mesCompareChartLink
 
             # slack notice
             slack = Slack()
