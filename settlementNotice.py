@@ -8,13 +8,15 @@ from operator import itemgetter
 import datetime
 import json
 import pdb
+import os
 
 class SettlementNotice():
     def __init__(self):
-        self.driver = webdriver.Chrome("./chromedriver")
+        exec_file_path = os.path.dirname(os.path.abspath(__file__))
+        self.driver = webdriver.Chrome(exec_file_path + "/chromedriver")
 
         # user
-        f = open("./config.json", 'r')
+        f = open(exec_file_path + "/config.json", 'r')
         json_data = json.load(f)
         f.close()
         self.user = json_data["stocks_pf"]
