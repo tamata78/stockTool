@@ -1,12 +1,14 @@
 # _*_ coding: utf-8 _*_
 from slacker import Slacker
 import json
+import os
 
 class Slack(object):
     __slacker = None
 
     def __init__(self):
-        f = open("config.json", 'r')
+        exec_file_path = os.path.dirname(os.path.abspath(__file__))
+        f = open(exec_file_path + "/config.json", 'r')
         json_data = json.load(f)
         token= json_data["slack_token"]
         self.__slacker = Slacker(token["token"])

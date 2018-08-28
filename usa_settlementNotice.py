@@ -7,14 +7,16 @@ from seleniumUtils import SeleniumUtils
 from operator import itemgetter
 from timeUtils import TimeUtils as tu
 import json
+import os
 
 class UsaSettlementNotice():
     def __init__(self):
-        self.driver = webdriver.Chrome("./chromedriver")
+        exec_file_path = os.path.dirname(os.path.abspath(__file__))
+        self.driver = webdriver.Chrome(exec_file_path + "/chromedriver")
         self.window_handle_len = len(self.driver.window_handles)
 
         # get main login user
-        f = open("./config.json", 'r')
+        f = open(exec_file_path + "/config.json", 'r')
         config = json.load(f)
         f.close()
         self.user = config["sbis_login_info"][0]

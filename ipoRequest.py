@@ -2,6 +2,7 @@ import time
 import json
 import datetime
 import sys
+import os
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
@@ -13,12 +14,14 @@ class IpoRequest():
     def __init__(self):
         # options = Options()
         # options.add_argument('--headless')
-        self.driver = webdriver.Chrome("./chromedriver")
+        exec_file_path = os.path.dirname(os.path.abspath(__file__))
+        self.driver = webdriver.Chrome(exec_file_path + "/chromedriver")
+
         self.applyCount = 0
         self.IPO_REQ_BUTTON = ".mtext a img[alt='申込']"
 
         # all member login info
-        f = open("config.json", 'r')
+        f = open(exec_file_path + "/config.json", 'r')
         json_data = json.load(f)
 
         #"sbis_login_info": [

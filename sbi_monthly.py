@@ -10,10 +10,12 @@ import time, re, sys
 import mojimoji
 import datetime
 import json
+import os
 
 class MoveMoneyInnerAccount():
     def __init__(self):
-        self.driver = webdriver.Chrome("./chromedriver")
+        exec_file_path = os.path.dirname(os.path.abspath(__file__))
+        self.driver = webdriver.Chrome(exec_file_path + "/chromedriver")
         self.verificationErrors = []
 
         # target month setting
@@ -24,7 +26,7 @@ class MoveMoneyInnerAccount():
         self.month = mojimoji.han_to_zen(han_month if param_han_month is None else param_han_month)
 
         # all member login info
-        f = open("config.json", 'r')
+        f = open(exec_file_path + "/config.json", 'r')
         json_data = json.load(f)
         # "sbib_login_info":{"uid": "user_id", "upa": "user_pass", "uspa": "user_tra_pass"},
         sbib = json_data["sbib"]
