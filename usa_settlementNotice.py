@@ -46,9 +46,11 @@ class UsaSettlementNotice():
             mesStockInfo = '\n'.join(mesList)
             mesCompareChartLink = '<https://www.morningstar.co.jp/frstock_us/compare.html?term=1Y' \
                     + ''.join(mesLinkParam) + '|compare chart>'
+            mesLineUpChart = '<https://stockcharts.com/freecharts/candleglance.html?$SPX,' + \
+                    ",".join(stock["stockCd"] for stock in sortedStockInfoList) +'|line up chart>'
 
             message = "=== portfolio settlement day ===\n" + mesStockInfo + "\n"\
-                    + mesCompareChartLink
+                    + mesCompareChartLink + "\n" + mesLineUpChart
 
             # slack notice
             slack = Slack()
