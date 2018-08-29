@@ -14,6 +14,7 @@ class UsaSettlementNotice():
         exec_file_path = os.path.dirname(os.path.abspath(__file__))
         self.driver = webdriver.Chrome(exec_file_path + "/chromedriver")
         self.window_handle_len = len(self.driver.window_handles)
+        self.CHART_DISP_LIMIT = 5
 
         # get main login user
         f = open(exec_file_path + "/config.json", 'r')
@@ -38,7 +39,7 @@ class UsaSettlementNotice():
             stockCount = 1
             for info in sortedStockInfoList:
                 mesList.append(" ".join([val for val in info.values()]))
-                if stockCount <= 5:
+                if stockCount <= self.CHART_DISP_LIMIT:
                     mesLinkParam.append("&symbol" + str(stockCount) + "=" + info["stockCd"])
                     stockCount += 1
 
