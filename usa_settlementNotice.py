@@ -4,6 +4,7 @@ from selenium.common.exceptions import NoSuchElementException
 from slacker import Slacker
 from slack_bot import Slack
 from seleniumUtils import SeleniumUtils
+from fileUtils import FileUtils
 from operator import itemgetter
 from timeUtils import TimeUtils as tu
 import json
@@ -11,15 +12,12 @@ import os
 
 class UsaSettlementNotice():
     def __init__(self):
-        exec_file_path = os.path.dirname(os.path.abspath(__file__))
-        self.driver = webdriver.Chrome(exec_file_path + "/chromedriver")
+        self.driver = SeleniumUtils.getChromedriver(__file__)
         self.window_handle_len = len(self.driver.window_handles)
         self.CHART_DISP_LIMIT = 5
 
         # get main login user
-        f = open(exec_file_path + "/config.json", 'r')
-        config = json.load(f)
-        f.close()
+        config = FileUtils.open_file(__file__, "/config.json")
         self.user = config["sbis_login_info"][0]
 
     def settlement_notice(self):

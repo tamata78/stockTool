@@ -6,6 +6,8 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
 from enum import Enum
+from seleniumUtils import SeleniumUtils
+from fileUtils import FileUtils
 import time, re, sys
 import mojimoji
 import datetime
@@ -14,8 +16,7 @@ import os
 
 class MoveMoneyInnerAccount():
     def __init__(self):
-        exec_file_path = os.path.dirname(os.path.abspath(__file__))
-        self.driver = webdriver.Chrome(exec_file_path + "/chromedriver")
+        self.driver = SeleniumUtils.getChromedriver(__file__)
         self.verificationErrors = []
 
         # target month setting
@@ -26,10 +27,9 @@ class MoveMoneyInnerAccount():
         self.month = mojimoji.han_to_zen(han_month if param_han_month is None else param_han_month)
 
         # all member login info
-        f = open(exec_file_path + "/config.json", 'r')
-        json_data = json.load(f)
+        config = FileUtils.open_file(__file__, "/config.json")
         # "sbib_login_info":{"uid": "user_id", "upa": "user_pass", "uspa": "user_tra_pass"},
-        sbib = json_data["sbib"]
+        sbib = config["sbib"]
         self.login_info = sbib["sbib_login_info"]
         self.move_money_info = sbib["move_money_info"]
 

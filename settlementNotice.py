@@ -5,6 +5,8 @@ from selenium.common.exceptions import NoAlertPresentException
 from slacker import Slacker
 from slack_bot import Slack
 from operator import itemgetter
+from seleniumUtils import SeleniumUtils
+from fileUtils import FileUtils
 import datetime
 import json
 import pdb
@@ -12,14 +14,11 @@ import os
 
 class SettlementNotice():
     def __init__(self):
-        exec_file_path = os.path.dirname(os.path.abspath(__file__))
-        self.driver = webdriver.Chrome(exec_file_path + "/chromedriver")
+        self.driver = SeleniumUtils.getChromedriver(__file__)
 
         # user
-        f = open(exec_file_path + "/config.json", 'r')
-        json_data = json.load(f)
-        f.close()
-        self.user = json_data["stocks_pf"]
+        config = FileUtils.open_file(__file__, "/config.json")
+        self.user = config["stocks_pf"]
 
     def get_stockInfoList(self):
         # portfolio HP

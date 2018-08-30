@@ -9,27 +9,20 @@ from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
 from slacker import Slacker
 from slack_bot import Slack
+from seleniumUtils import SeleniumUtils
+from fileUtils import FileUtils
 
 class IpoRequest():
     def __init__(self):
-        # options = Options()
-        # options.add_argument('--headless')
-        exec_file_path = os.path.dirname(os.path.abspath(__file__))
-        self.driver = webdriver.Chrome(exec_file_path + "/chromedriver")
+        self.driver = SeleniumUtils.getChromedriver(__file__)
 
         self.applyCount = 0
         self.IPO_REQ_BUTTON = ".mtext a img[alt='申込']"
 
         # all member login info
-        f = open(exec_file_path + "/config.json", 'r')
-        json_data = json.load(f)
+        config = FileUtils.open_file(__file__, "/config.json")
 
-        #"sbis_login_info": [
-        #{"uid": "111-022200", "upa": "user_pass", "uspa": "user_trade"},
-        #{"uid": "111-033300", "upa": "user_pass", "uspa": "user_trade"},
-        #]
-        login_info = json_data["sbis_login_info"]
-        self.login_info_list = login_info
+        self.login_info_list = config["sbis_login_info"]
 
     def ipo_request(self):
         driver = self.driver
