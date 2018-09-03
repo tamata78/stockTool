@@ -1,18 +1,13 @@
-import time
-import json
 import datetime
 import sys
-import os
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import WebDriverException
-from slacker import Slacker
 from slack_bot import Slack
 from seleniumUtils import SeleniumUtils
 from fileUtils import FileUtils
 
+
 class IpoRequest():
+
     def __init__(self):
         self.driver = SeleniumUtils.getChromedriver(__file__)
 
@@ -39,14 +34,15 @@ class IpoRequest():
             slack.post_message_to_channel("general", message)
         except WebDriverException:
             import traceback
-            message = "occurred system error!!\n" + traceback.print_exc()
+            message = "occurred system error!!\n" + str(traceback.print_exc())
             slack.post_message_to_channel("general", message)
         finally:
             driver.close()
 
     def one_person_ipo_request(self, driver, login_info):
         driver.find_element_by_name("user_id").send_keys(login_info["uid"])
-        driver.find_element_by_name("user_password").send_keys(login_info["upa"])
+        driver.find_element_by_name(
+            "user_password").send_keys(login_info["upa"])
         driver.find_element_by_name("ACT_login").click()
 
         # open IPO apply page
@@ -76,25 +72,29 @@ class IpoRequest():
             sys.exit()
 
         for stock_table in apply_stock_tables:
-            stock_table.find_element_by_css_selector(self.IPO_REQ_BUTTON).click()
+            stock_table.find_element_by_css_selector(
+                self.IPO_REQ_BUTTON).click()
 
             # input application contents
-            driver.find_element_by_name("suryo").send_keys(1000) # request num
+            driver.find_element_by_name("suryo").send_keys(1000)  # request num
             driver.find_element_by_xpath("//*[@id='strPriceRadio']").click()
             driver.find_element_by_name("useKbn").send_keys(0)
             driver.find_element_by_name("usePoint").send_keys("")
-            driver.find_element_by_name("tr_pass").send_keys(login_info["uspa"])
+            driver.find_element_by_name(
+                "tr_pass").send_keys(login_info["uspa"])
             driver.find_element_by_name("order_kakunin").click()
 
             # fixed apply
             driver.find_element_by_name("order_btn").click()
-            driver.find_element_by_css_selector(".mtext a[href='/oeliw011?type=21']").click()
+            driver.find_element_by_css_selector(
+                ".mtext a[href='/oeliw011?type=21']").click()
 
             self.applyCount += 1
 
         # logout
         driver.find_element_by_xpath('//*[@id="logoutM"]/a/img').click()
-        driver.find_element_by_xpath('//*[@id="navi01P"]/ul/li[1]/a/img').click()
+        driver.find_element_by_xpath(
+            '//*[@id="navi01P"]/ul/li[1]/a/img').click()
 
     def createApplyStTbls(self, stock_tables):
         applyStTbls = []
@@ -115,6 +115,7 @@ class IpoRequest():
 
         # when today isthe previous most recent apply date, execute application
         return applyEndDate >= d_now - datetime.timedelta(days=1)
+
 
 if __name__ == "__main__":
     ipoRequest = IpoRequest()

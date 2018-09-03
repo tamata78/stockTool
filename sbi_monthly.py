@@ -1,20 +1,15 @@
 # -*- coding: utf-8 -*-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
-from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import NoAlertPresentException
 from enum import Enum
 from seleniumUtils import SeleniumUtils
 from fileUtils import FileUtils
-import time, re, sys
+import sys
 import mojimoji
 import datetime
-import json
-import os
+
 
 class MoveMoneyInnerAccount():
+
     def __init__(self):
         self.driver = SeleniumUtils.getChromedriver(__file__)
         self.verificationErrors = []
@@ -24,7 +19,8 @@ class MoveMoneyInnerAccount():
         if len(sys.argv) > 1:
             param_han_month = sys.argv[1]
         han_month = str(datetime.datetime.today().month + 1)
-        self.month = mojimoji.han_to_zen(han_month if param_han_month is None else param_han_month)
+        self.month = mojimoji.han_to_zen(
+            han_month if param_han_month is None else param_han_month)
 
         # all member login info
         config = FileUtils.open_file(__file__, "/config.json")
@@ -36,14 +32,15 @@ class MoveMoneyInnerAccount():
     def sbi_money_move(self):
         driver = self.driver
         login_info = self.login_info
-        zen_month = self.month
 
         # login
         driver.get("https://www.netbk.co.jp/wpl/NBGate/i010002CT")
         driver.find_element_by_name("userName").send_keys(login_info["uid"])
         driver.find_element_by_name("loginPwdSet").send_keys(login_info["upa"])
-        driver.find_element_by_xpath("//*[@id='side']/form/div/div[2]/div[1]/input").click()
-        driver.find_element_by_xpath("//*[@id='main']/div[5]/dl[1]/dd/dl[2]/dt/a").click()
+        driver.find_element_by_xpath(
+            "//*[@id='side']/form/div/div[2]/div[1]/input").click()
+        driver.find_element_by_xpath(
+            "//*[@id='main']/div[5]/dl[1]/dd/dl[2]/dt/a").click()
 
         # transfar money from delegate
         self.transfarMoney(AcctCode.TRAVEL)
@@ -75,7 +72,8 @@ class MoveMoneyInnerAccount():
         self.editMemo(AcctNote.EDUCATION)
 
         # each account display
-        driver.find_element_by_xpath(u"(//a[contains(text(),'残高照会（口座別）')])[3]").click()
+        driver.find_element_by_xpath(
+            u"(//a[contains(text(),'残高照会（口座別）')])[3]").click()
 
     def transfarMoney(self, acctCode):
         driver = self.driver
@@ -83,8 +81,10 @@ class MoveMoneyInnerAccount():
         login_info = self.login_info
 
         driver.find_element_by_name("whdrwlAcctCode").click()
-        driver.find_element_by_xpath("(//input[@name='dpstAcctCode'])[" + acctCode.code + "]").click()
-        driver.find_element_by_name("transAmt").send_keys(mmoney_info[acctCode.money_key])
+        driver.find_element_by_xpath(
+            "(//input[@name='dpstAcctCode'])[" + acctCode.code + "]").click()
+        driver.find_element_by_name("transAmt").send_keys(
+            mmoney_info[acctCode.money_key])
         driver.find_element_by_name("ACT_doConfirm").click()
         driver.find_element_by_name("transPW").send_keys(login_info["uspa"])
         driver.find_element_by_name("ACT_doDecide").click()
@@ -94,22 +94,26 @@ class MoveMoneyInnerAccount():
         driver = self.driver
         zen_month = self.month
 
-        driver.find_element_by_xpath("(//input[@name='memoInput'])[" + acctNote.move_money_order + "]").send_keys(u"" + zen_month + "月分" + acctNote.memo)
+        driver.find_element_by_xpath(
+            "(//input[@name='memoInput'])[" + acctNote.move_money_order + "]").send_keys(u"" + zen_month + "月分" + acctNote.memo)
 
     def editMemo(self, acctNote):
         driver = self.driver
         zen_month = self.month
 
         driver.find_element_by_name("acctBusPdCodeInput").click()
-        Select(driver.find_element_by_name("acctBusPdCodeInput")).select_by_visible_text(acctNote.acct)
+        Select(driver.find_element_by_name("acctBusPdCodeInput")
+               ).select_by_visible_text(acctNote.acct)
         driver.find_element_by_name("ACT_doShow").click()
         driver.find_element_by_link_text(u"メモ編集").click()
-        driver.find_element_by_name("memoInput").send_keys(u"" + zen_month + "月分" + acctNote.memo)
+        driver.find_element_by_name("memoInput").send_keys(
+            u"" + zen_month + "月分" + acctNote.memo)
         driver.find_element_by_name("ACT_doDecideMemoEdit").click()
 
     def tearDown(self):
         self.driver.quit()
         self.assertEqual([], self.verificationErrors)
+
 
 class AcctCode(Enum):
     TRAVEL = ("3", "travel")
@@ -122,9 +126,10 @@ class AcctCode(Enum):
         self.code = code
         self.money_key = money_key
 
+
 class AcctNote(Enum):
     TRAVEL = ("5", u"旅費", "")
-    FUNDING = ("4", u"積立（教、節税）","、教育教材、寄付控")
+    FUNDING = ("4", u"積立（教、節税）", "、教育教材、寄付控")
     SEXPENSE = ("3", u"冠婚・大物・服", "、冠婚・ネット購入代")
     PERSONAL = ("2", u"個人", "")
     EDUCATION = ("1", u"教育費", "")
@@ -134,8 +139,7 @@ class AcctNote(Enum):
         self.acct = acct
         self.memo = memo
 
+
 if __name__ == "__main__":
     moveMoney = MoveMoneyInnerAccount()
     moveMoney.sbi_money_move()
-
-
