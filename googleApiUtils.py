@@ -3,6 +3,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 import gspread
 import os
 
+
 class GoogleApiUtils():
 
     @staticmethod
@@ -14,4 +15,3 @@ class GoogleApiUtils():
 
         credentials = ServiceAccountCredentials.from_json_keyfile_name(exec_file_path + "/" + secfile, scope)
         return gspread.authorize(credentials)
-
