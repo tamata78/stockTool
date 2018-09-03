@@ -3,6 +3,7 @@ from slacker import Slacker
 import json
 import os
 
+
 class Slack(object):
     __slacker = None
 
@@ -10,7 +11,7 @@ class Slack(object):
         exec_file_path = os.path.dirname(os.path.abspath(__file__))
         f = open(exec_file_path + "/config.json", 'r')
         json_data = json.load(f)
-        token= json_data["slack_token"]
+        token = json_data["slack_token"]
         self.__slacker = Slacker(token["token"])
 
     def get_channel_list(self):
@@ -30,4 +31,3 @@ class Slack(object):
 
         channel_name = "#" + channel
         self.__slacker.chat.post_message(channel_name, message)
-
