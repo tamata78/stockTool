@@ -108,6 +108,5 @@ venv.bak/
 # my setting
 chromedriver
 config.json
-stockToolenv
 stockTool
 mypro_sec.json

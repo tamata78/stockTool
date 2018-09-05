@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
-from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
-from slacker import Slacker
 from slack_bot import Slack
 from seleniumUtils import SeleniumUtils
 from fileUtils import FileUtils
 from operator import itemgetter
-from timeUtils import TimeUtils as tu
-import json
-import os
+
 
 class UsaSettlementNotice():
+
     def __init__(self):
         self.driver = SeleniumUtils.getChromedriver(__file__)
         self.window_handle_len = len(self.driver.window_handles)
@@ -22,8 +19,6 @@ class UsaSettlementNotice():
 
     def settlement_notice(self):
         try:
-            driver = self.driver
-
             # holdings stock list
             stockInfoList = self.get_stockInfoList()
 
@@ -42,13 +37,10 @@ class UsaSettlementNotice():
                     stockCount += 1
 
             mesStockInfo = '\n'.join(mesList)
-            mesCompareChartLink = '<https://www.morningstar.co.jp/frstock_us/compare.html?term=1Y' \
-                    + ''.join(mesLinkParam) + '|compare chart>'
-            mesLineUpChart = '<https://stockcharts.com/freecharts/candleglance.html?$SPX,' + \
-                    ",".join(stock["stockCd"] for stock in sortedStockInfoList) +'|line up chart>'
+            mesCompareChartLink = '<https://www.morningstar.co.jp/frstock_us/compare.html?term=1Y' + ''.join(mesLinkParam) + '|compare chart>'
+            mesLineUpChart = '<https://stockcharts.com/freecharts/candleglance.html?$SPX,' + ",".join(stock["stockCd"] for stock in sortedStockInfoList) + '|line up chart>'
 
-            message = "=== portfolio settlement day ===\n" + mesStockInfo + "\n"\
-                    + mesCompareChartLink + "\n" + mesLineUpChart
+            message = "=== portfolio settlement day ===\n" + mesStockInfo + "\n" + mesCompareChartLink + "\n" + mesLineUpChart
 
             # slack notice
             slack = Slack()
@@ -81,7 +73,7 @@ class UsaSettlementNotice():
 
         # get pfStockInfo
         pfSpeStockList = driver.find_elements_by_xpath('//*[@id="main"]/table[3]/tbody/tr')
-        del pfSpeStockList[len(pfSpeStockList) - 1] # del sum line
+        del pfSpeStockList[len(pfSpeStockList) - 1]  # del sum line
         pfNisaStockList = driver.find_elements_by_xpath('//*[@id="main"]/table[5]/tbody/tr')
         del pfNisaStockList[len(pfNisaStockList) - 1]
         pfStockList = pfSpeStockList + pfNisaStockList
@@ -113,12 +105,14 @@ class UsaSettlementNotice():
         for stockInfo in stockInfoList:
             stockCd = stockInfo["stockCd"]
             try:
-                stockInfo["profitAnnoDay"] = settleInfo.find_element_by_xpath( \
-                    'tr/td[position()=1][text()="'+ stockCd +'"]/parent::tr/td[position()=3]').text
+
+                stockInfo["profitAnnoDay"] = settleInfo.find_element_by_xpath(
+                    'tr/td[position()=1][text()="' + stockCd + '"]/parent::tr/td[position()=3]').text
             except NoSuchElementException:
                 stockInfo["profitAnnoDay"] = "-"
 
+
 if __name__ == "__main__":
+
     settle = UsaSettlementNotice()
     settle.settlement_notice()
-

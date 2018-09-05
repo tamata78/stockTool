@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 
+
 class TimeUtils:
     start_time = 0
     end_time = 0
@@ -17,4 +18,3 @@ class TimeUtils:
     def elapse_time():
         elapse_time = TimeUtils.end_time - TimeUtils.start_time
         return print(f"経過時間：{elapse_time}")
-
