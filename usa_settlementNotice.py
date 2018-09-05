@@ -10,7 +10,6 @@ class UsaSettlementNotice():
 
     def __init__(self):
         self.driver = SeleniumUtils.getChromedriver(__file__)
-        self.window_handle_len = len(self.driver.window_handles)
         self.CHART_DISP_LIMIT = 5
 
         # get main login user
@@ -57,7 +56,6 @@ class UsaSettlementNotice():
         # portfolio HP
         driver = self.driver
         user = self.user
-        window_handle_len = self.window_handle_len
 
         # SBI securities page
         driver.get("https://www.sbisec.co.jp/ETGate")
@@ -67,8 +65,9 @@ class UsaSettlementNotice():
 
         # forign stock page
         driver.find_element_by_xpath('//*[@id="side"]/div[2]/div/div/div/div/ul/li[3]/a').click()
-        self.window_handle_len = SeleniumUtils.switch_other_tab(driver, window_handle_len)
-        driver.find_element_by_xpath('//*[@id="gNav"]/ul/li[5]/a/img').click()
+        XPATH_AC = '//*[@id="gNav"]/ul/li[5]/a/img'
+        self.window_handle_len = SeleniumUtils.switch_other_tab(driver, XPATH_AC)
+        driver.find_element_by_xpath(XPATH_AC).click()
         driver.find_element_by_xpath('//*[@id="mArea02"]/div[2]/ul/li[2]/a').click()
 
         # get pfStockInfo
