@@ -104,7 +104,6 @@ class UsaSettlementNotice():
         for stockInfo in stockInfoList:
             stockCd = stockInfo["stockCd"]
             try:
-
                 stockInfo["profitAnnoDay"] = settleInfo.find_element_by_xpath(
                     'tr/td[position()=1][text()="' + stockCd + '"]/parent::tr/td[position()=3]').text
             except NoSuchElementException:
