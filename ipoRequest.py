@@ -57,8 +57,8 @@ class IpoRequest():
 
         apply_stock_tables = self.createApplyStTbls(stock_tables)
         if not apply_stock_tables:
+# remove commentout if you fail on the way, commmentout sys.exit()
             sys.exit()
-# remove commentout if you fail on the way
 #            driver.find_element_by_xpath('//*[@id="logoutM"]/a/img').click()
 #            driver.find_element_by_xpath('//*[@id="navi01P"]/ul/li[1]/a/img').click()
 #            return
@@ -72,6 +72,7 @@ class IpoRequest():
             sys.exit()
 
         for stock_table in apply_stock_tables:
+            SeleniumUtils.waitClickableTgtElement(driver, self.IPO_REQ_BUTTON)
             stock_table.find_element_by_css_selector(
                 self.IPO_REQ_BUTTON).click()
 
