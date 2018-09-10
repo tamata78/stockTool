@@ -22,3 +22,7 @@ class SeleniumUtils:
     def getChromedriver(exec_file):
         exec_file_path = os.path.dirname(os.path.abspath(exec_file))
         return webdriver.Chrome(exec_file_path + "/chromedriver")
+
+    @staticmethod
+    def waitClickableTgtElement(driver, tgtEleCssSelector):
+        WebDriverWait(driver, 15).until(EC.elementToBeClickable((By.CSS_SELECTOR, tgtEleCssSelector)))
