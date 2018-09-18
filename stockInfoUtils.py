@@ -33,23 +33,22 @@ class StockInfoUtils:
 
             # From stock data start index To end index.
             for stockIndex in range(START_INDEX, END_INDEX):
-                stockInfo = {}
                 pfStockEl = pfStockList[stockIndex]
                 elTds = pfStockEl.find_elements_by_tag_name("td")
+                portStock = PortStock()
+                portStock.stockCd = elTds[0].text
+                portStock.stockNm = elTds[1].text
+                portStock.volume = elTds[6].text
+                portStock.dividend = elTds[7].text
+                portStock.numSharesHeld = elTds[8].text
+                portStock.purchasePrice = elTds[10].text
+                portStock.profitLoss = elTds[11].text
+                portStock.profitLossRate = elTds[12].text
+                portStock.annualDividend = elTds[13].text
+                portStock.yutai = elTds[14].text
+                portStock.settlementMonth = elTds[15].text
 
-                stockInfo["stockCd"] = elTds[0].text
-                stockInfo["stockNm"] = elTds[1].text
-                stockInfo["volume"] = elTds[6].text
-                stockInfo["yield"] = elTds[7].text
-                stockInfo["num_shares_held"] = elTds[8].text
-                stockInfo["purchase_price"] = elTds[10].text
-                stockInfo["profit_loss"] = elTds[11].text
-                stockInfo["profit_loss_rate"] = elTds[12].text
-                stockInfo["annual_dividend"] = elTds[13].text
-                stockInfo["yutai"] = elTds[14].text
-                stockInfo["settlement_month"] = elTds[15].text
-
-                stockInfoList.append(stockInfo)
+                stockInfoList.append(portStock)
 
             # holdings stock
             return stockInfoList
