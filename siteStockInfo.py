@@ -15,3 +15,20 @@ class PortStock:
     annualDividend: str
     yutai: str
     settlementMonth: str
+
+@dataclasses.dataclass
+class GmoTranHis:
+    stockLink: str
+    stockName: str
+    stockCd: str
+    marketCd: str
+    tranKbn: str
+    buySellKbn: str
+    orderAmount: str
+    limitPrice: str
+    realPrice: str
+    orderStatus: str
+    tradeDatetime: str
+    yakujyoSuuryo: str
+    yakujyoTanka: str
+    jyuchuDatetime: str
