@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from fileUtils import FileUtils
+from gSpSheetUtils import GSpSheetUtils
+from siteStockInfo import PortStock, GmoTranHis
 
 
 class StockInfoUtils:
@@ -27,7 +29,7 @@ class StockInfoUtils:
                        user["uid"])
 
             START_INDEX = 6
-            stockInfoList = []
+            pfStocks = []
             pfStockList = driver.find_elements_by_xpath(
                 "/html/body/table/tbody/tr")
             END_INDEX = (len(pfStockList) - 1) - 1
@@ -36,24 +38,85 @@ class StockInfoUtils:
             for stockIndex in range(START_INDEX, END_INDEX):
                 pfStockEl = pfStockList[stockIndex]
                 elTds = pfStockEl.find_elements_by_tag_name("td")
-                portStock = PortStock()
-                portStock.stockCd = elTds[0].text
-                portStock.stockNm = elTds[1].text
-                portStock.volume = elTds[6].text
-                portStock.dividend = elTds[7].text
-                portStock.numSharesHeld = elTds[8].text
-                portStock.purchasePrice = elTds[10].text
-                portStock.profitLoss = elTds[11].text
-                portStock.profitLossRate = elTds[12].text
-                portStock.annualDividend = elTds[13].text
-                portStock.yutai = elTds[14].text
-                portStock.settlementMonth = elTds[15].text
+                stockCd = elTds[0].text
+                stockNm = elTds[1].text
+                volume = elTds[6].text
+                dividend = elTds[7].text
+                numSharesHeld = elTds[8].text
+                purchasePrice = elTds[10].text
+                profitLoss = elTds[11].text
+                profitLossRate = elTds[12].text
+                annualDividend = elTds[13].text
+                yutai = elTds[14].text
+                settlementMonth = elTds[15].text
 
-                stockInfoList.append(portStock)
+                portStock = PortStock(stockCd, stockNm, volume, dividend,
+                                      numSharesHeld, purchasePrice, profitLoss,
+                                      profitLossRate, annualDividend, yutai, settlementMonth)
+                pfStocks.append(portStock)
 
             # holdings stock
-            return stockInfoList
+            return pfStocks
 
         except Exception:
             import traceback
             traceback.print_exc()
+
+    @staticmethod
+    def getGmoTranHis(driver):
+        iniConf = StockInfoUtils.__read_init_conf()
+        config = iniConf["config"]
+        user = config["gmo"]
+
+        try:
+            DISP_SPAN_1WEEK_AGO = 2
+            DISP_STATUS_EFFECTIVE_PROMISED = 2
+
+            # login
+            driver.get("https://sec-sso.click-sec.com/loginweb/sso-redirect")
+            driver.find_element_by_name("j_username").send_keys(user["uid"])
+            driver.find_element_by_name("j_password").send_keys(user["upa"])
+            driver.find_element_by_name("LoginForm").click()
+
+            # search trade history
+            driver.find_element_by_id("kabuMenu").click()
+            driver.find_element_by_id("kabuSubMenuOrderHistory").click()
+            driver.find_element_by_name("displaySpan").send_keys(DISP_SPAN_1WEEK_AGO)
+            driver.find_element_by_name("displayStatus").send_keys(DISP_STATUS_EFFECTIVE_PROMISED)
+            driver.find_element_by_id("searchButton").click()
+
+            # get trade history
+            traHisDomList = driver.find_elements_by_class_name("is-selectable")
+            tranHisInfoList = []
+
+            for index, traHisDom in enumerate(traHisDomList):
+                sIndex = str(index)
+                traHisTds = traHisDom.find_elements_by_tag_name("td")
+                orderStatus = traHisTds[6].find_element_by_id("orderStatus" + sIndex).text
+                if orderStatus in ["取消済", "失効済"]:
+                    continue
+
+                stockLink = traHisTds[1].find_element_by_id("meigara" + sIndex)
+                stockName = traHisTds[1].find_element_by_id("meigaraName" + sIndex)
+                stockCd = traHisTds[1].find_element_by_id("securityCode" + sIndex)
+                marketCd = traHisTds[1].find_element_by_id("marketCode" + sIndex)
+                tranKbn = traHisTds[2].find_element_by_id("torihikiKbn" + sIndex)
+                buySellKbn = traHisTds[2].find_element_by_id("baibaiKbn" + sIndex)
+                orderAmount = traHisTds[3].find_element_by_id("orderAmount" + sIndex)
+                limitPrice = traHisTds[4].find_element_by_id("limitPrice" + sIndex)
+                realPrice = traHisTds[4].find_element_by_id("realPrice" + sIndex)
+                orderStatus = orderStatus
+                tradeDatetime = traHisTds[7].find_element_by_id("tradeDatetime" + sIndex)
+                yakujyoSuuryo = traHisTds[8].find_element_by_id("yakujyoSuuryo" + sIndex)
+                yakujyoTanka = traHisTds[9].find_element_by_id("yakujyoTanka" + sIndex)
+                jyuchuDatetime = traHisTds[11].find_element_by_id("jyuchuDatetime" + sIndex)
+
+                gmoTranHis = GmoTranHis(stockLink, stockName, stockCd, marketCd, tranKbn, buySellKbn, orderAmount, limitPrice, realPrice, orderStatus, tradeDatetime, yakujyoSuuryo, yakujyoTanka, jyuchuDatetime)
+                tranHisInfoList.append(gmoTranHis)
+
+            return tranHisInfoList
+
+        except Exception:
+            import traceback
+            traceback.print_exc()
+
