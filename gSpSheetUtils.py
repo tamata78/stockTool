@@ -4,7 +4,7 @@ import gspread
 import os
 
 
-class GoogleApiUtils():
+class GSpSheetUtils():
 
     @staticmethod
     def getGoogleCred(exec_file, secfile):
@@ -15,3 +15,4 @@ class GoogleApiUtils():
 
         credentials = ServiceAccountCredentials.from_json_keyfile_name(exec_file_path + "/" + secfile, scope)
         return gspread.authorize(credentials)
+

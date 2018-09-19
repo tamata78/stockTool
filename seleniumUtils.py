@@ -25,4 +25,4 @@ class SeleniumUtils:
 
     @staticmethod
     def waitClickableTgtElement(driver, tgtEleCssSelector):
-        WebDriverWait(driver, 15).until(EC.elementToBeClickable((By.CSS_SELECTOR, tgtEleCssSelector)))
+        WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.CSS_SELECTOR, tgtEleCssSelector)))
