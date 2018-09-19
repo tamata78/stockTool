@@ -5,13 +5,14 @@ from fileUtils import FileUtils
 class StockInfoUtils:
 
     @staticmethod
-    def __read_init_conf(iniConf):
+    def __read_init_conf():
+        iniConf = {}
         iniConf["config"] = FileUtils.open_file(__file__, "/config.json")
+        return iniConf
 
     @staticmethod
     def getPortfolio(driver):
-        iniConf = {}
-        StockInfoUtils.__read_init_conf(iniConf)
+        iniConf = StockInfoUtils.__read_init_conf()
 
         config = iniConf["config"]
         user = config["stocks_pf"]
