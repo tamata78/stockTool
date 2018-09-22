@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from slack_bot import Slack
-from operator import itemgetter
+from operator import attrgetter
 from seleniumUtils import SeleniumUtils
 from stockInfoUtils import StockInfoUtils
 
@@ -19,12 +19,12 @@ class SettlementNotice():
 
         # set display message
         sortedStockInfoList = sorted(
-            stockInfoList, key=itemgetter("profitAnnoDay"))
+            stockInfoList, key=attrgetter("profitAnnoDay"))
         mesList = []
-        for info in sortedStockInfoList:
-            if info["profitAnnoDay"] == '-':
+        for stockInfo in sortedStockInfoList:
+            if stockInfo.profitAnnoDay == '-':
                 continue
-            mesList.append(" ".join([info["stockCd"], info["stockNm"]]))
+            mesList.append(" ".join([stockInfo.stockCd, stockInfo.stockNm]))
 
         mesStockInfo = '\n'.join(mesList)
         message = "■保有銘柄の決算日\n" + mesStockInfo
@@ -38,7 +38,7 @@ class SettlementNotice():
     def set_kabtan_stockInfo(self, stockInfoList):
         driver = self.driver
         for stockInfo in stockInfoList:
-            stockCd = stockInfo["stockCd"]
+            stockCd = stockInfo.stockCd
             finance_url = "https://kabutan.jp/stock/finance?code=" + stockCd + "&mode=k"
             driver.get(finance_url)
 
@@ -46,12 +46,12 @@ class SettlementNotice():
             profitAnnoDay = driver.find_element_by_xpath(
                 "//*[@id='kessan_happyoubi']").text.replace(' 発表', '')
             if profitAnnoDay:
-                stockInfo["profitAnnoDay"] = profitAnnoDay[-10:]
+                stockInfo.profitAnnoDay = profitAnnoDay[-10:]
             else:
-                stockInfo["profitAnnoDay"] = '-'
+                stockInfo.profitAnnoDay = '-'
 
             # set finance_url
-            stockInfo["finance_url"] = "<" + finance_url + "|決算情報>"
+            stockInfo.finance_url = "<" + finance_url + "|決算情報>"
 
 
 if __name__ == "__main__":
