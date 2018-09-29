@@ -12,7 +12,7 @@ class IpoRequest():
         self.driver = SeleniumUtils.getChromedriver(__file__)
 
         self.applyCount = 0
-        self.IPO_REQ_BUTTON = ".mtext a img[alt='申込']"
+        self.IPO_REQ_BUTTON_SELECTOR = "a[name] + table .mtext a img[alt='申込']"
 
         # all member login info
         config = FileUtils.open_file(__file__, "/config.json")
@@ -65,16 +65,16 @@ class IpoRequest():
 
         stock_len = len(apply_stock_tables)
         mostReceStockTbl = apply_stock_tables[stock_len - 1]
-        stockInfo = mostReceStockTbl.find_elements_by_css_selector(".mtext")
+        stockInfoTds = mostReceStockTbl.find_elements_by_css_selector(".mtext")
 
 # do commentout below two line if you fail on the way
-        if not self.isIpoApplyExec(stockInfo):
+        if not self.isIpoApplyExec(stockInfoTds):
             sys.exit()
 
-        for stock_table in apply_stock_tables:
-            SeleniumUtils.waitClickableTgtElement(driver, self.IPO_REQ_BUTTON)
-            stock_table.find_element_by_css_selector(
-                self.IPO_REQ_BUTTON).click()
+        stock_reqbtns = driver.find_elements_by_css_selector(self.IPO_REQ_BUTTON_SELECTOR)
+
+        while(stock_reqbtns):
+            stock_reqbtns[0].click()
 
             # input application contents
             driver.find_element_by_name("suryo").send_keys(1000)  # request num
@@ -91,6 +91,7 @@ class IpoRequest():
                 ".mtext a[href='/oeliw011?type=21']").click()
 
             self.applyCount += 1
+            stock_reqbtns = driver.find_elements_by_css_selector(self.IPO_REQ_BUTTON_SELECTOR)
 
         # logout
         driver.find_element_by_xpath('//*[@id="logoutM"]/a/img').click()
@@ -100,13 +101,13 @@ class IpoRequest():
     def createApplyStTbls(self, stock_tables):
         applyStTbls = []
         for table in stock_tables:
-            if table.find_elements_by_css_selector(self.IPO_REQ_BUTTON):
+            if table.find_elements_by_css_selector(self.IPO_REQ_BUTTON_SELECTOR):
                 applyStTbls.append(table)
 
         return applyStTbls
 
-    def isIpoApplyExec(self, stockInfo):
-        strApplyEndDate = stockInfo[1].text.split("～")[1].split(" ")[0]
+    def isIpoApplyExec(self, stockInfoTds):
+        strApplyEndDate = stockInfoTds[1].text.split("～")[1].split(" ")[0]
         applyEndMon = int(strApplyEndDate.split("/")[0])
         applyEndDay = int(strApplyEndDate.split("/")[1])
 
@@ -114,8 +115,8 @@ class IpoRequest():
         year_now = d_now.year
         applyEndDate = datetime.date(year_now, applyEndMon, applyEndDay)
 
-        # when today isthe previous most recent apply date, execute application
-        return applyEndDate >= d_now - datetime.timedelta(days=1)
+        # when today is two days ago most recent apply date, execute application
+        return applyEndDate >= d_now - datetime.timedelta(days=2)
 
 
 if __name__ == "__main__":
