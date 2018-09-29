@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from fileUtils import FileUtils
-from gSpSheetUtils import GSpSheetUtils
 from siteStockInfo import PortStock, GmoTranHis
 
 
@@ -69,9 +68,6 @@ class StockInfoUtils:
         user = config["gmo"]
 
         try:
-            DISP_SPAN_1WEEK_AGO = 2
-            DISP_STATUS_EFFECTIVE_PROMISED = 2
-
             # login
             driver.get("https://sec-sso.click-sec.com/loginweb/sso-redirect")
             driver.find_element_by_name("j_username").send_keys(user["uid"])
@@ -81,13 +77,13 @@ class StockInfoUtils:
             # search trade history
             driver.find_element_by_id("kabuMenu").click()
             driver.find_element_by_id("kabuSubMenuOrderHistory").click()
-            driver.find_element_by_name("displaySpan").send_keys(DISP_SPAN_1WEEK_AGO)
-            driver.find_element_by_name("displayStatus").send_keys(DISP_STATUS_EFFECTIVE_PROMISED)
+            driver.find_element_by_xpath("//*[@id='displaySpan']/option[3]").click()
+            driver.find_element_by_xpath("//*[@id='displayStatus']/option[1]").click()
             driver.find_element_by_id("searchButton").click()
 
             # get trade history
             traHisDomList = driver.find_elements_by_class_name("is-selectable")
-            tranHisInfoList = []
+            gmoTranHisList = []
 
             for index, traHisDom in enumerate(traHisDomList):
                 sIndex = str(index)
@@ -96,27 +92,25 @@ class StockInfoUtils:
                 if orderStatus in ["取消済", "失効済"]:
                     continue
 
-                stockLink = traHisTds[1].find_element_by_id("meigara" + sIndex)
-                stockName = traHisTds[1].find_element_by_id("meigaraName" + sIndex)
-                stockCd = traHisTds[1].find_element_by_id("securityCode" + sIndex)
-                marketCd = traHisTds[1].find_element_by_id("marketCode" + sIndex)
-                tranKbn = traHisTds[2].find_element_by_id("torihikiKbn" + sIndex)
-                buySellKbn = traHisTds[2].find_element_by_id("baibaiKbn" + sIndex)
-                orderAmount = traHisTds[3].find_element_by_id("orderAmount" + sIndex)
-                limitPrice = traHisTds[4].find_element_by_id("limitPrice" + sIndex)
-                realPrice = traHisTds[4].find_element_by_id("realPrice" + sIndex)
-                orderStatus = orderStatus
-                tradeDatetime = traHisTds[7].find_element_by_id("tradeDatetime" + sIndex)
-                yakujyoSuuryo = traHisTds[8].find_element_by_id("yakujyoSuuryo" + sIndex)
-                yakujyoTanka = traHisTds[9].find_element_by_id("yakujyoTanka" + sIndex)
-                jyuchuDatetime = traHisTds[11].find_element_by_id("jyuchuDatetime" + sIndex)
+                stockLink = traHisTds[1].find_element_by_id("meigara" + sIndex).get_attribute("href")
+                stockName = traHisTds[1].find_element_by_id("meigaraName" + sIndex).text
+                stockCd = traHisTds[1].find_element_by_id("securityCode" + sIndex).text
+                marketCd = traHisTds[1].find_element_by_id("marketCode" + sIndex).text
+                tranKbn = traHisTds[2].find_element_by_id("torihikiKbn" + sIndex).text
+                buySellKbn = traHisTds[2].find_element_by_id("baibaiKbn" + sIndex).text
+                orderAmount = traHisTds[3].find_element_by_id("orderAmount" + sIndex).text
+                limitPrice = traHisTds[4].find_element_by_id("limitPrice" + sIndex).text.replace("円", "")
+                realPrice = traHisTds[4].find_element_by_id("realPrice" + sIndex).text
+                tradeDatetime = traHisTds[7].find_element_by_id("tradeDatetime" + sIndex).text
+                yakujyoSuuryo = traHisTds[7].find_element_by_id("yakujyoSuuryo" + sIndex).text
+                yakujyoTanka = traHisTds[7].find_element_by_id("yakujyoTanka" + sIndex).text
+                jyuchuDatetime = traHisTds[9].find_element_by_id("jyuchuDatetime" + sIndex).text
 
                 gmoTranHis = GmoTranHis(stockLink, stockName, stockCd, marketCd, tranKbn, buySellKbn, orderAmount, limitPrice, realPrice, orderStatus, tradeDatetime, yakujyoSuuryo, yakujyoTanka, jyuchuDatetime)
-                tranHisInfoList.append(gmoTranHis)
+                gmoTranHisList.append(gmoTranHis)
 
-            return tranHisInfoList
+            return gmoTranHisList
 
         except Exception:
             import traceback
             traceback.print_exc()
-
