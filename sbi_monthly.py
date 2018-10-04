@@ -15,8 +15,13 @@ class MoveMoneyInnerAccount():
         self.verificationErrors = []
 
         # target month setting
-        param_han_month = None
         if len(sys.argv) > 1:
+            warn_mes = "Sample:\n  python3 sbi_monthly.py [write his memo month]"
+            print(warn_mes)
+            sys.exit()
+
+        param_han_month = None
+        if len(sys.argv) == 1:
             param_han_month = sys.argv[1]
         han_month = str(datetime.datetime.today().month + 1)
         self.month = mojimoji.han_to_zen(
