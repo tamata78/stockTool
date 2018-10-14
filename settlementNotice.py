@@ -24,7 +24,7 @@ class SettlementNotice():
         for stockInfo in sortedStockInfoList:
             if stockInfo.profitAnnoDay == '-':
                 continue
-            mesList.append(" ".join([stockInfo.stockCd, stockInfo.stockNm]))
+            mesList.append(" ".join([stockInfo.stockCd, stockInfo.stockNm, stockInfo.profitAnnoDay]))
 
         mesStockInfo = '\n'.join(mesList)
         message = "■保有銘柄の決算日\n" + mesStockInfo
