@@ -18,3 +18,8 @@ class FileUtils:
     def readCsv(file):
         csv_dframe = pd.read_csv(file)
         return csv_dframe
+
+    @staticmethod
+    def writeFile(file, data):
+        with open(file, 'wb') as f:
+            f.write(data)

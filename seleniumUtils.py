@@ -43,3 +43,19 @@ class SeleniumUtils:
     @staticmethod
     def waitClickableTgtElement(driver, tgtEleCssSelector):
         WebDriverWait(driver, 15).until(EC.element_to_be_clickable((By.CSS_SELECTOR, tgtEleCssSelector)))
+
+    @staticmethod
+    def capureRange(driver, url, capRange):
+        driver.get(url)
+        # driver.screenshot_as_png
+        now_d = datetime.datetime.now()
+        strNowTime = now_d.strftime("%Y%m%d%H%M%S")
+        img_path = "./cap_" + strNowTime + ".png"
+
+        png = driver.find_element_by_id(capRange).screenshot_as_png
+
+        # driver.get_screenshot_as_file(img_path)
+
+        FileUtils.writeFile(img_path, png)
+
+        return img_path
