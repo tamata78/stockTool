@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import os
+import pandas as pd
 
 
 class FileUtils:
@@ -12,3 +13,8 @@ class FileUtils:
             config = json.load(f)
 
         return config
+
+    @staticmethod
+    def readCsv(file):
+        csv_dframe = pd.read_csv(file)
+        return csv_dframe
