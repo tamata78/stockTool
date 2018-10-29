@@ -7,7 +7,7 @@ from fileUtils import FileUtils
 class capureContr():
 
     def __init__(self):
-        self.driver = SeleniumUtils.getFirefoxdriver(__file__, True)
+        self.driver = SeleniumUtils.getChromedriver(__file__, True)
 
         capTgtList = FileUtils.readCsv("cap_tgt_list.csv")
 
@@ -18,11 +18,11 @@ class capureContr():
         slack = Slack()
         try:
 
-            for url, capRange in zip(self.capTgtList['url'], self.capTgtList['capRange']):
-                img_path = SeleniumUtils.capureRange(driver, url, capRange)
+            for url in self.capTgtList['url']:
+                img_path = SeleniumUtils.capureRange(driver, url)
 
                 # post img to slack
-                slack.post_img_to_channel("general", img_path)
+                #slack.post_img_to_channel("general", img_path)
 
         except WebDriverException:
             import traceback
