@@ -31,3 +31,7 @@ class Slack(object):
 
         channel_name = "#" + channel
         self.__slacker.chat.post_message(channel_name, message)
+
+    def post_img_to_channel(self, channel, img_path):
+        channel_name = "#" + channel
+        self.__slacker.files.upload(img_path, channels=[channel_name], title=img_path)
