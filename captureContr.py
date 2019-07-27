@@ -22,7 +22,7 @@ class capureContr():
                 img_path = SeleniumUtils.capureRange(driver, url)
 
                 # post img to slack
-                #slack.post_img_to_channel("general", img_path)
+                slack.post_img_to_channel("general", img_path)
 
         except WebDriverException:
             import traceback
