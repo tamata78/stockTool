@@ -12,7 +12,7 @@ class IpoRequest():
         self.driver = SeleniumUtils.getChromedriver(__file__)
 
         self.applyCount = 0
-        self.IPO_REQ_BUTTON_SELECTOR = "a[name] + table .mtext a img[alt='申込']"
+        self.IPO_REQ_BUTTON_SELECTOR = "a[name] + table .fl01 a img[alt='申込']"
 
         # all member login info
         config = FileUtils.open_file(__file__, "/config.json")
@@ -65,11 +65,11 @@ class IpoRequest():
 
         stock_len = len(apply_stock_tables)
         mostReceStockTbl = apply_stock_tables[stock_len - 1]
-        stockInfoTds = mostReceStockTbl.find_elements_by_css_selector(".mtext")
+        stockInfoTds = mostReceStockTbl.find_elements_by_css_selector(".fl01")
 
 # do commentout below two line if you fail on the way
-        if not self.isIpoApplyExec(stockInfoTds):
-            sys.exit()
+        # if not self.isIpoApplyExec(stockInfoTds):
+        #    sys.exit()
 
         stock_reqbtns = driver.find_elements_by_css_selector(self.IPO_REQ_BUTTON_SELECTOR)
 
@@ -77,7 +77,7 @@ class IpoRequest():
             stock_reqbtns[0].click()
 
             # input application contents
-            driver.find_element_by_name("suryo").send_keys(1000)  # request num
+            driver.find_element_by_name("suryo").send_keys(3000)  # request num
             driver.find_element_by_xpath("//*[@id='strPriceRadio']").click()
             driver.find_element_by_name("useKbn").send_keys(0)
             driver.find_element_by_name("usePoint").send_keys("")
@@ -107,7 +107,7 @@ class IpoRequest():
         return applyStTbls
 
     def isIpoApplyExec(self, stockInfoTds):
-        strApplyEndDate = stockInfoTds[1].text.split("～")[1].split(" ")[0]
+        strApplyEndDate = stockInfoTds[3].text.split("～")[1].split(" ")[0]
         applyEndMon = int(strApplyEndDate.split("/")[0])
         applyEndDay = int(strApplyEndDate.split("/")[1])
 
