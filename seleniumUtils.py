@@ -64,9 +64,9 @@ class SeleniumUtils:
         # set window size and zoom
         page_width = driver.execute_script('return document.body.scrollWidth')
         # page_height = driver.execute_script('return document.body.scrollHeight')
-        print(page_width)
+
         driver.set_window_size(page_width, 200)
         driver.execute_script("document.body.style.zoom='90%'")
-        #driver.save_screenshot(img_path)
+        driver.save_screenshot(img_path)
 
         return img_path
