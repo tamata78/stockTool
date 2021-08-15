@@ -47,7 +47,7 @@ class IpoRequest():
 
         # open IPO apply page
         driver.find_element_by_xpath('//*[@id="navi01P"]/ul/li[3]').click()
-        driver.find_element_by_xpath('//*[@id="navi02P"]/ul/li[6]').click()
+        driver.find_element_by_xpath('//*[@id="navi02P"]/ul/li[5]').click()
         driver.find_element_by_xpath('//*[@id="main"]/div[10]/div/div').click()
 
         # apply IPO
