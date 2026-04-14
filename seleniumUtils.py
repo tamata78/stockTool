@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -7,7 +9,6 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.chrome.options import Options
 import os
 import datetime
-
 
 class SeleniumUtils:
 
@@ -28,10 +29,17 @@ class SeleniumUtils:
 
         if isHeadless:
             options = Options()
-            options.add_argument("--headless")
-            driver = webdriver.Chrome(executable_path=exec_file_path + "/chromedriver", chrome_options=options)
+            options.add_argument("--no-sandbox")  # macOSで役立つ
+            options.add_argument("--disable-dev-shm-usage")
+            # options.add_argument("--headless")  # バックグラウンド実行時はコメント解除
+
+            # 自動ダウンロードとドライバー設定
+            service = ChromeService(ChromeDriverManager().install())
+            driver = webdriver.Chrome(service=service, options=options)
         else:
-            driver = webdriver.Chrome(executable_path=exec_file_path + "/chromedriver")
+            # 自動ダウンロードとドライバー設定
+            service = ChromeService(ChromeDriverManager().install())
+            driver = webdriver.Chrome(service=service)
 
         return driver
 
