@@ -23,25 +23,17 @@ class SeleniumUtils:
         return current_handle_len
 
     @staticmethod
-    def getChromedriver(exec_file, isHeadless=False):
-        driver = None
-        exec_file_path = os.path.dirname(os.path.abspath(exec_file))
+    def getChromedriver(exec_file, isHeadless=False, page_load_strategy="normal"):
+        options = Options()
+        options.page_load_strategy = page_load_strategy
 
         if isHeadless:
-            options = Options()
             options.add_argument("--no-sandbox")  # macOSで役立つ
             options.add_argument("--disable-dev-shm-usage")
             # options.add_argument("--headless")  # バックグラウンド実行時はコメント解除
 
-            # 自動ダウンロードとドライバー設定
-            service = ChromeService(ChromeDriverManager().install())
-            driver = webdriver.Chrome(service=service, options=options)
-        else:
-            # 自動ダウンロードとドライバー設定
-            service = ChromeService(ChromeDriverManager().install())
-            driver = webdriver.Chrome(service=service)
-
-        return driver
+        service = ChromeService(ChromeDriverManager().install())
+        return webdriver.Chrome(service=service, options=options)
 
     @staticmethod
     def getFirefoxdriver(exec_file, isHeadless):
