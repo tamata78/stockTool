@@ -111,3 +111,4 @@ config.json
 stockTool
 mypro_sec.json
 cap_tgt_list.csv
+debug_*
